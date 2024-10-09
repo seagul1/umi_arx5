@@ -37,6 +37,9 @@ def create_usb_list():
     return device_list
 
 def reset_usb_device(dev_path):
+    """
+    调用 ioctl 系统调用来重置指定的USB设备
+    """
     USBDEVFS_RESET = 21780
     try:
         f = open(dev_path, 'w', os.O_WRONLY)
@@ -60,6 +63,8 @@ def reset_all_elgato_devices():
             reset_usb_device(dev_usb_path)
 
 def get_sorted_v4l_paths(by_id=True):
+    # 该函数通过遍历 /dev/v4l 目录下的 by-id 或 by-path 子目录，查找并筛选有效的视频设备路径。
+    # 有效的视频设备路径是指以 index0 结尾的设备路径。最终返回一个包含这些有效路径的列表。
     """
     If by_id, sort devices by device name + serial number (preserves device order)
     else, sort devices by usb bus id (preserves usb port order)

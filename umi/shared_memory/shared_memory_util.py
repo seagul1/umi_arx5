@@ -12,6 +12,9 @@ class ArraySpec:
 
 
 class SharedAtomicCounter:
+    """
+    共享进程的原子计数器，用于确保多进程安全防止冲突
+    """
     def __init__(self, 
             shm_manager: SharedMemoryManager, 
             size :int=8 # 64bit int
@@ -37,3 +40,11 @@ class SharedAtomicCounter:
     def add(self, value: int):
         with atomicview(buffer=self.buf, atype=UINT) as a:
             a.add(value, order=MemoryOrder.ACQ_REL)
+            
+if __name__ == "__main__":
+    shm_manager = SharedMemoryManager()
+    shm_manager.start()
+    shac = SharedAtomicCounter(shm_manager, size=8)
+    shac.shm.buf[:2] = bytearray([22, 23])
+    print(bytes(shac.buf))
+    shm_manager.shutdown()
